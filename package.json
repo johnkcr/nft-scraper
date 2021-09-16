@@ -1,0 +1,34 @@
+{
+  "name": "nft-scraper",
+  "version": "0.0.1",
+  "description": "nft-scraper using moralis-sdk",
+  "main": "index.js",
+  "author": "John Carter",
+  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "lint": "./node_modules/.bin/eslint ./src ./test",
+    "check": "npm run lint && npm test && npm run coverage"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/johnkcr/nft-scraper.git"
+  },
+  "keywords": [
+    "NFT",
+    "moralis"
+  ],
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "coveralls": "^3.1.1",
+    "eslint": "^7.32.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^9.1.2",
+    "nyc": "^15.1.0",
+    "sinon": "^11.1.2"
+  }
+}
