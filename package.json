@@ -6,11 +6,15 @@
   "author": "John Carter",
   "license": "ISC",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsdx build",
+    "test": "dotenv -e .env --tsdx test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "./node_modules/.bin/eslint ./src ./test",
     "check": "npm run lint && npm test && npm run coverage"
   },
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=8.0.0"
   },
@@ -29,6 +33,13 @@
     "istanbul": "^0.4.5",
     "mocha": "^9.1.2",
     "nyc": "^15.1.0",
-    "sinon": "^11.1.2"
+    "sinon": "^11.1.2",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "@types/node": "^16.9.6",
+    "dotenv-cli": "^4.0.0",
+    "tsdx": "^0.14.1"
   }
 }
