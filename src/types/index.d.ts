@@ -1,0 +1,21 @@
+
+export enum ChainList {
+  Eth = 'eth',
+  _0x1 = '0x1',
+  Ropsten = 'ropsten',
+  _0x3 = '0x3',
+  Rinkeby = 'rinkeby',
+  _0x4 = '0x4',
+  Goerli = 'goerli',
+  _0x5 = '0x5',
+  Kovan = 'kovan',
+  _0x2a = '0x2a',
+  Polygon = 'polygon',
+  _0x89 = '0x89',
+  Mumbai = 'mumbai',
+  _0x13881 = '0x13881',
+  Bsc = 'bsc',
+  _0x38 = '0x38',
+  BscTestnet = 'bsc testnet',
+  _0x61 = '0x61',
+}

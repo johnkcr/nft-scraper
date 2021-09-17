@@ -1,0 +1,3 @@
+export const MORALIS_SERVER_URL = process.env["MORALIS_SERVER_URL"] || "https://sv8erjsrz4wg.bigmoralis.com:2053/server";
+export const MORALIS_APPLICATION_ID = process.env["MORALIS_APPLICATION_ID"] || "jlvmvCLbkVYZdgOMeKvYCuK8awZLCQARSLRsVb5o";
+export const MORALIS_CLOUD_URL =  process.env["MORALIS_CLOUD_URL "] || "https://vgyy4b11hszk.bigmoralis.com:2053/server/functions/getNFT?_ApplicationId=UkAR38SqWww25gkgwKdW2AC1nFG08kUWwzOQwE5C&nftId=";

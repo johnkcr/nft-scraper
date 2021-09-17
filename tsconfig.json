@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
     "resolveJsonModule": true
-  }
+  },
+  "include": [
+    "environment.d.ts"
+  ]
 }
