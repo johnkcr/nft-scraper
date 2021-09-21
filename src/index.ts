@@ -10,6 +10,10 @@ import * as api from './moralis/api';
 const config: Configuration = { apiKey: MORALIS_API_KEY, accessToken: MORALIS_APPLICATION_ID };
 const instance: api.AccountApi = new api.AccountApi(config);
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /**
   * Gets NFTs owned by the given address * The response will include status [SYNCED/SYNCING] based on the contracts being indexed. * Use the token_address param to get results for a specific contract only * Note results will include all indexed NFTs * Any request which includes the token_address param will start the indexing process for that NFT collection the very first time it is requested
   * @summary Gets the NFTs owned by a given address
@@ -28,29 +32,38 @@ const getAllNFTs = async (
   order?: string
 ): Promise<Array<api.NftOwner>> => {
   
-  console.log("what is the issue")
-  const offset = 0;
-  const pageSize = 50;
-
-  const result: Array<api.NftOwner> = [];
+  let page = 0;
+  let pageSize = 100;
+  let NFTs: Array<api.NftOwner> = [];
+  let delay = 3;
   try{
-    const res = await instance.getNFTs(address, chain, format, offset, pageSize);
-    console.log(res)
+    while(true) {
+      const response = await instance.getNFTs(address, chain, format, page * pageSize, page * pageSize + pageSize);
+      if(response.status == 'SYNCING' && delay !== 0) {
+        await sleep(2000);
+        delay--;
+        continue;
+      }
+      if(delay === 0) {
+        console.error("Moralis NFT SDK Syncing Failed");
+        throw(new Error("error moralis sdk getNfts sync failed"));
+      }
+      NFTs = [...NFTs, ...response.result];
+      page++;
+      if(page * pageSize > response.total) break;
+    }
   } catch(err) {
-    console.error("error occured while fetching user nfts");
+    console.error("error occured while fetching user NFTs");
     throw(err);
   }
-  return result;
+  return NFTs;
 }
 
 const runProcess = async () => {
   console.log("woww");
   const res = await getAllNFTs("0x9B6134Fe036F1C22D9Fe76c15AC81B7bC31212eB", api.ChainList.Rinkeby);
-  console.log(res);
 }
 
-const runApp = async () => {
-  await runProcess();
+export const {
+  getAllNFTs
 }
-
-runApp();

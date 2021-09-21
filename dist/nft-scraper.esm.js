@@ -1946,6 +1946,12 @@ var config = {
   accessToken: MORALIS_APPLICATION_ID
 };
 var instance = /*#__PURE__*/new AccountApi(config);
+
+function sleep(ms) {
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, ms);
+  });
+}
 /**
   * Gets NFTs owned by the given address * The response will include status [SYNCED/SYNCING] based on the contracts being indexed. * Use the token_address param to get results for a specific contract only * Note results will include all indexed NFTs * Any request which includes the token_address param will start the indexing process for that NFT collection the very first time it is requested
   * @summary Gets the NFTs owned by a given address
@@ -1958,42 +1964,83 @@ var instance = /*#__PURE__*/new AccountApi(config);
   * @memberof AccountApi
 */
 
+
 var getAllNFTs = /*#__PURE__*/function () {
   var _ref = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee(address, chain, format, order) {
-    var offset, pageSize, result, res;
+    var page, pageSize, NFTs, delay, response;
     return runtime_1.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            console.log("what is the issue");
-            offset = 0;
-            pageSize = 50;
-            result = [];
+            page = 0;
+            pageSize = 100;
+            NFTs = [];
+            delay = 3;
             _context.prev = 4;
-            _context.next = 7;
-            return instance.getNFTs(address, chain, format, offset, pageSize);
 
-          case 7:
-            res = _context.sent;
-            console.log(res);
-            _context.next = 15;
+          case 5:
+
+            _context.next = 8;
+            return instance.getNFTs(address, chain, format, page * pageSize, page * pageSize + pageSize);
+
+          case 8:
+            response = _context.sent;
+
+            if (!(response.status == 'SYNCING' && delay !== 0)) {
+              _context.next = 14;
+              break;
+            }
+
+            _context.next = 12;
+            return sleep(2000);
+
+          case 12:
+            delay--;
+            return _context.abrupt("continue", 5);
+
+          case 14:
+            if (!(delay === 0)) {
+              _context.next = 17;
+              break;
+            }
+
+            console.error("Moralis NFT SDK Syncing Failed");
+            throw new Error("error moralis sdk getNfts sync failed");
+
+          case 17:
+            NFTs = [].concat(NFTs, response.result);
+            page++;
+
+            if (!(page * pageSize > response.total)) {
+              _context.next = 21;
+              break;
+            }
+
+            return _context.abrupt("break", 23);
+
+          case 21:
+            _context.next = 5;
             break;
 
-          case 11:
-            _context.prev = 11;
+          case 23:
+            _context.next = 29;
+            break;
+
+          case 25:
+            _context.prev = 25;
             _context.t0 = _context["catch"](4);
-            console.error("error occured while fetching user nfts");
+            console.error("error occured while fetching user NFTs");
             throw _context.t0;
 
-          case 15:
-            return _context.abrupt("return", result);
+          case 29:
+            return _context.abrupt("return", NFTs);
 
-          case 16:
+          case 30:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[4, 11]]);
+    }, _callee, null, [[4, 25]]);
   }));
 
   return function getAllNFTs(_x, _x2, _x3, _x4) {
@@ -2003,7 +2050,6 @@ var getAllNFTs = /*#__PURE__*/function () {
 
 var runProcess = /*#__PURE__*/function () {
   var _ref2 = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee2() {
-    var res;
     return runtime_1.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -2013,10 +2059,8 @@ var runProcess = /*#__PURE__*/function () {
             return getAllNFTs("0x9B6134Fe036F1C22D9Fe76c15AC81B7bC31212eB", ChainList.Rinkeby);
 
           case 3:
-            res = _context2.sent;
-            console.log(res);
 
-          case 5:
+          case 4:
           case "end":
             return _context2.stop();
         }
