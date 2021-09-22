@@ -15,55 +15,66 @@ function sleep(ms) {
 }
 
 /**
-  * Gets NFTs owned by the given address * The response will include status [SYNCED/SYNCING] based on the contracts being indexed. * Use the token_address param to get results for a specific contract only * Note results will include all indexed NFTs * Any request which includes the token_address param will start the indexing process for that NFT collection the very first time it is requested
-  * @summary Gets the NFTs owned by a given address
+  * Gets all NFTs owned by the given address * 
+  * @summary Gets all the NFTs owned by a given address
   * @param {string} address The owner of a given token
   * @param {ChainList} [chain] The chain to query
   * @param {string} [format] The format of the token id
   * @param {string} [order] The field(s) to order on and if it should be ordered in ascending or descending order. Specified by: fieldName1.order,fieldName2.order. Example 1: \&quot;name\&quot;, \&quot;name.ASC\&quot;, \&quot;name.DESC\&quot;, Example 2: \&quot;Name and Symbol\&quot;, \&quot;name.ASC,symbol.DESC\&quot;
-  * @param {*} [options] Override http request option.
+  * @param {string} [delayLimit] The deay limt to sync moralis api. Default 10,000 ms
   * @throws {RequiredError}
   * @memberof AccountApi
 */
-const getAllNFTs = async (
+export const getAllNFTs = async (
   address: string,
   chain?: api.ChainList,
   format?: string,
-  order?: string
+  order?: string,
+  delayLimit: number = 10000,
 ): Promise<Array<api.NftOwner>> => {
   
-  let page = 0;
-  let pageSize = 100;
   let NFTs: Array<api.NftOwner> = [];
-  let delay = 3;
+  // delay 10 secs to sync the address for the first time.
+
   try{
-    while(true) {
-      const response = await instance.getNFTs(address, chain, format, page * pageSize, page * pageSize + pageSize);
-      if(response.status == 'SYNCING' && delay !== 0) {
-        await sleep(2000);
-        delay--;
+
+    let offset = 0, totalCount = 0;
+    let page = 0, pageSize = 100;
+    let waitSyncTime = -1;
+
+    while(offset <= totalCount) {
+      const response = await instance.getNFTs(address, chain, format, offset, offset + pageSize);
+
+      if(waitSyncTime > delayLimit ) {
+        console.error("error occured in getAllNFTs: sync failed");
+        throw(new Error("error occured in getAllNFTs: sync failed"));
+      }
+
+      if(response.status == 'SYNCING') {
+        await sleep(3000);
+        waitSyncTime += 3000;
         continue;
       }
-      if(delay === 0) {
-        console.error("Moralis NFT SDK Syncing Failed");
-        throw(new Error("error moralis sdk getNfts sync failed"));
-      }
+
       NFTs = [...NFTs, ...response.result];
+      
       page++;
-      if(page * pageSize > response.total) break;
+      offset = page * pageSize;
+      totalCount = response.total;
     }
+
   } catch(err) {
-    console.error("error occured while fetching user NFTs");
+    console.error("error occured in getNFTs:", err);
     throw(err);
   }
   return NFTs;
 }
 
+
 const runProcess = async () => {
   console.log("woww");
   const res = await getAllNFTs("0x9B6134Fe036F1C22D9Fe76c15AC81B7bC31212eB", api.ChainList.Rinkeby);
+  console.log(res.length);
 }
 
-export const {
-  getAllNFTs
-}
+runProcess();

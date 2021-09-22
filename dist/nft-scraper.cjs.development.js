@@ -1955,103 +1955,106 @@ function sleep(ms) {
   });
 }
 /**
-  * Gets NFTs owned by the given address * The response will include status [SYNCED/SYNCING] based on the contracts being indexed. * Use the token_address param to get results for a specific contract only * Note results will include all indexed NFTs * Any request which includes the token_address param will start the indexing process for that NFT collection the very first time it is requested
-  * @summary Gets the NFTs owned by a given address
+  * Gets all NFTs owned by the given address *
+  * @summary Gets all the NFTs owned by a given address
   * @param {string} address The owner of a given token
   * @param {ChainList} [chain] The chain to query
   * @param {string} [format] The format of the token id
   * @param {string} [order] The field(s) to order on and if it should be ordered in ascending or descending order. Specified by: fieldName1.order,fieldName2.order. Example 1: \&quot;name\&quot;, \&quot;name.ASC\&quot;, \&quot;name.DESC\&quot;, Example 2: \&quot;Name and Symbol\&quot;, \&quot;name.ASC,symbol.DESC\&quot;
-  * @param {*} [options] Override http request option.
+  * @param {string} [delayLimit] The deay limt to sync moralis api. Default 10,000 ms
   * @throws {RequiredError}
   * @memberof AccountApi
 */
 
 
 var getAllNFTs = /*#__PURE__*/function () {
-  var _ref = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee(address, chain, format, order) {
-    var page, pageSize, NFTs, delay, response;
+  var _ref = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee(address, chain, format, order, delayLimit) {
+    var NFTs, offset, totalCount, page, pageSize, waitSyncTime, response;
     return runtime_1.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            page = 0;
-            pageSize = 100;
-            NFTs = [];
-            delay = 3;
-            _context.prev = 4;
+            if (delayLimit === void 0) {
+              delayLimit = 10000;
+            }
 
-          case 5:
+            NFTs = []; // delay 10 secs to sync the address for the first time.
 
-            _context.next = 8;
-            return instance.getNFTs(address, chain, format, page * pageSize, page * pageSize + pageSize);
+            _context.prev = 2;
+            offset = 0, totalCount = 0;
+            page = 0, pageSize = 100;
+            waitSyncTime = -1;
 
-          case 8:
+          case 6:
+            if (!(offset <= totalCount)) {
+              _context.next = 24;
+              break;
+            }
+
+            _context.next = 9;
+            return instance.getNFTs(address, chain, format, offset, offset + pageSize);
+
+          case 9:
             response = _context.sent;
 
-            if (!(response.status == 'SYNCING' && delay !== 0)) {
-              _context.next = 14;
+            if (!(waitSyncTime > delayLimit)) {
+              _context.next = 13;
               break;
             }
 
-            _context.next = 12;
-            return sleep(2000);
+            console.error("error occured in getAllNFTs: sync failed");
+            throw new Error("error occured in getAllNFTs: sync failed");
 
-          case 12:
-            delay--;
-            return _context.abrupt("continue", 5);
-
-          case 14:
-            if (!(delay === 0)) {
-              _context.next = 17;
+          case 13:
+            if (!(response.status == 'SYNCING')) {
+              _context.next = 18;
               break;
             }
 
-            console.error("Moralis NFT SDK Syncing Failed");
-            throw new Error("error moralis sdk getNfts sync failed");
+            _context.next = 16;
+            return sleep(3000);
 
-          case 17:
+          case 16:
+            waitSyncTime += 3000;
+            return _context.abrupt("continue", 6);
+
+          case 18:
             NFTs = [].concat(NFTs, response.result);
             page++;
-
-            if (!(page * pageSize > response.total)) {
-              _context.next = 21;
-              break;
-            }
-
-            return _context.abrupt("break", 23);
-
-          case 21:
-            _context.next = 5;
+            offset = page * pageSize;
+            totalCount = response.total;
+            _context.next = 6;
             break;
 
-          case 23:
-            _context.next = 29;
+          case 24:
+            _context.next = 30;
             break;
 
-          case 25:
-            _context.prev = 25;
-            _context.t0 = _context["catch"](4);
-            console.error("error occured while fetching user NFTs");
+          case 26:
+            _context.prev = 26;
+            _context.t0 = _context["catch"](2);
+            console.error("error occured in getNFTs:", _context.t0);
             throw _context.t0;
 
-          case 29:
+          case 30:
             return _context.abrupt("return", NFTs);
 
-          case 30:
+          case 31:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[4, 25]]);
+    }, _callee, null, [[2, 26]]);
   }));
 
-  return function getAllNFTs(_x, _x2, _x3, _x4) {
+  return function getAllNFTs(_x, _x2, _x3, _x4, _x5) {
     return _ref.apply(this, arguments);
   };
 }();
 
 var runProcess = /*#__PURE__*/function () {
   var _ref2 = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee2() {
+    var res;
     return runtime_1.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -2061,8 +2064,10 @@ var runProcess = /*#__PURE__*/function () {
             return getAllNFTs("0x9B6134Fe036F1C22D9Fe76c15AC81B7bC31212eB", ChainList.Rinkeby);
 
           case 3:
+            res = _context2.sent;
+            console.log(res.length);
 
-          case 4:
+          case 5:
           case "end":
             return _context2.stop();
         }
@@ -2075,27 +2080,7 @@ var runProcess = /*#__PURE__*/function () {
   };
 }();
 
-var runApp = /*#__PURE__*/function () {
-  var _ref3 = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee3() {
-    return runtime_1.wrap(function _callee3$(_context3) {
-      while (1) {
-        switch (_context3.prev = _context3.next) {
-          case 0:
-            _context3.next = 2;
-            return runProcess();
+runProcess();
 
-          case 2:
-          case "end":
-            return _context3.stop();
-        }
-      }
-    }, _callee3);
-  }));
-
-  return function runApp() {
-    return _ref3.apply(this, arguments);
-  };
-}();
-
-runApp();
+exports.getAllNFTs = getAllNFTs;
 //# sourceMappingURL=nft-scraper.cjs.development.js.map
