@@ -35,8 +35,6 @@ export const getUpdatedUserNFTs = (lastUpdatedAt: Date) => {
   return Moralis.Cloud.run('getUpdatedNFTs', { lastUpdatedAt });
 }
 
-
-
 // Just for testing will remove this part
 const runProcess = async () => {
   try {
