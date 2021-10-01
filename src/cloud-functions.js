@@ -31,13 +31,13 @@ Moralis.cloud.define('getUpdatedNFTs', async function(request) {
         { match: { updatedAt: { $gte : new Date(lastUpdatedAt).toISOString() } } }
     ];
 
+    // Get all NFT transfers since lastUpdatedAt 
     const result = await query.aggregate(pipeline);
-
     const tokenIds = result.map((tx) => tx.token_id);
 
+    // Get all NFT tokens since lastUpdatedAt
     const EthQuery = new Moralis.Query('EthNFTOwners');
     EthQuery.containedIn('token_id', tokenIds);
-
     const queryResults = await EthQuery.find({ useMasterKey : true });
       
     const tokens = [];
