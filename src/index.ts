@@ -27,6 +27,17 @@ export const addUserToWatchEthEvent = (userAddress: string) => {
   return Moralis.Cloud.run('watchEthAddress', { address: userAddress })
 }
 
+/**
+  * @summary Get all tokens after specific time
+  * @param {string} lastUpdatedAt The owner of a given token
+*/
+export const getUpdatedUserNFTs = (lastUpdatedAt: Date) => {
+  return Moralis.Cloud.run('getUpdatedNFTs', { lastUpdatedAt });
+}
+
+
+
+// Just for testing will remove this part
 const runProcess = async () => {
   try {
     const userNFTs = await getUserNFTs('0x9B6134Fe036F1C22D9Fe76c15AC81B7bC31212eB');

@@ -828,6 +828,16 @@ var addUserToWatchEthEvent = function addUserToWatchEthEvent(userAddress) {
     address: userAddress
   });
 };
+/**
+  * @summary Get all tokens after specific time
+  * @param {string} lastUpdatedAt The owner of a given token
+*/
+
+var getUpdatedUserNFTs = function getUpdatedUserNFTs(lastUpdatedAt) {
+  return Moralis.Cloud.run('getUpdatedNFTs', {
+    lastUpdatedAt: lastUpdatedAt
+  });
+}; // Just for testing will remove this part
 
 var runProcess = /*#__PURE__*/function () {
   var _ref = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee() {
@@ -877,5 +887,6 @@ var runProcess = /*#__PURE__*/function () {
 runProcess();
 
 exports.addUserToWatchEthEvent = addUserToWatchEthEvent;
+exports.getUpdatedUserNFTs = getUpdatedUserNFTs;
 exports.getUserNFTs = getUserNFTs;
 //# sourceMappingURL=nft-scraper.cjs.development.js.map
