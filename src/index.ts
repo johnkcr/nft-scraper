@@ -13,7 +13,7 @@ Moralis.initialize(MORALIS_APPLICATION_ID);
 
 /**
   * @summary Gets the NFTs owned by a given address
-  * @param {string} address The owner of a given token
+  * @param {string} address The owner address
 */
 export const getUserNFTs = (userAddress: string) => {
   return Moralis.Cloud.run('getUserNFTs', { userAddress });
@@ -21,7 +21,7 @@ export const getUserNFTs = (userAddress: string) => {
 
 /**
   * @summary Add new user to watchEthEvent Table
-  * @param {string} address The owner of a given token
+  * @param {string} address The owner address
 */
 export const addUserToWatchEthEvent = (userAddress: string) => {
   return Moralis.Cloud.run('watchEthAddress', { address: userAddress })
@@ -29,7 +29,7 @@ export const addUserToWatchEthEvent = (userAddress: string) => {
 
 /**
   * @summary Get all tokens after specific time
-  * @param {string} lastUpdatedAt The owner of a given token
+  * @param {Date} lastUpdatedAt The last updated time
 */
 export const getUpdatedUserNFTs = (lastUpdatedAt: Date) => {
   return Moralis.Cloud.run('getUpdatedNFTs', { lastUpdatedAt });
